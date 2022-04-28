@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+securityContext: test-scc
+serviceuser: testuser
+metadata:
+  #Name des Pods
+  name: OpenShiftMonitoring
+  labels:
+    app: OpenShiftMonitoring
+spec:
+  containers:
+    - name: OpenShiftMonitoring
+      #hier nur der Basiscontainer, da das Dataport Repository nicht von außen erreichbar ist
+      image: registry.access.redhat.com/ubi8:8.5-236.1647448331
+      volumeMounts:
+      - mountPath: /host/etc
+        name: etc
+      - mountPath: /host/proc
+        name: proc
+      - mountPath: /host/bin
+        name: bin
+      - mountPath: /host/usr/lib
+        name: usr
+      - mountPath: /test
+        name: empty
+  volumes:
+  - name: etc
+    hostPath:
+      path: /etc/
+  - name: proc
+    hostPath:
+      path: /proc/
+  - name: bin
+    hostPath:
+      path: /bin/
+  - name: usr
+    hostPath:
+      path: /usr/lib/
+  - name: empty
+    emptyDir: {}
+
+
+
