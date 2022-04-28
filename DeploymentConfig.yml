@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openshiftmonitoring
+spec:
+  #wieviele container laufen sollen
+  replicas: 1
+  #welches Container repliziert werden sollen
+  selector:
+    matchLabels:
+      app: openshiftmonitoring
+  #Definiert Templates
+  template:
+    metadata:
+      labels:
+        app: openshiftmonitoring
+    #Definition Container Identisch zu PodConfig
+    spec:
+      securityContext:
+        privileged: true
+      containers:
+      - name: openshiftmonitoring
+        #BasisImage des Containers
+        image: registry.access.redhat.com/ubi8:8.5-236.1647448331
+        imagePullPolicy: IfNotPresent
+
+        #welches Volumes gemountet werden sollen
+        volumeMounts:
+        - mountPath: /host/etc
+          name: etc
+        - mountPath: /host/proc
+          name: proc
+        - mountPath: /host/bin
+          name: bin
+        - mountPath: /host/usr/lib
+          name: usr
+        - mountPath: /dev/vmcp
+          name: vmcp
+        - mountPath: /test
+          name: empty
+      #Volumes Definition
+      volumes:
+      - name: etc
+        hostPath:
+          path: /etc/
+      - name: proc
+        hostPath:
+          path: /proc/
+      - name: bin
+        hostPath:
+          path: /bin/
+      - name: usr
+        hostPath:
+          path: /usr/lib/
+      - name: empty
+        emptyDir: {}
+
+      #Soll der Pod restarten? Never,OnFailure,Always
+      restartPolicy: Never
